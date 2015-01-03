@@ -7,3 +7,10 @@ These connections are then registered at init.
 This is a very simple, somewhat hacky implementation of this idea.
 If you think the bones are good and want to contribute here, please fork me.
 If you'd like to steal the idea and start from scratch, please do so (and let me know).
+
+---
+
+TODO :
+    * Implement all fields of P2P
+    * Improver render of metabox
+    * Implement interface for custom fields into P2P.
