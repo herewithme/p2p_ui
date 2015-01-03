@@ -11,6 +11,8 @@ If you'd like to steal the idea and start from scratch, please do so (and let me
 ---
 
 TODO :
-    * Implement all fields of P2P
+    * Implement all fields of P2P API
+    * Add user connection feature
     * Improver render of metabox
     * Implement interface for custom fields into P2P.
+    * Export into XML or PHP code
