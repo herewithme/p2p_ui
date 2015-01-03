@@ -8,9 +8,9 @@ class P2P_UI_Plugin {
 	}
 
 	/**
-	 * 
+	 *
 	 */
-	function register_post_type() {
+	public static function register_post_type() {
 		register_post_type( P2P_UI_CPT_NAME,
 			array(
 				'labels'        => array(

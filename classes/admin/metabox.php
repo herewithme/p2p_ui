@@ -6,25 +6,27 @@ class P2P_UI_Admin_Metabox {
 	 */
 	public function __construct() {
 		add_action( 'save_post', array(__CLASS__, 'save_connection_meta'), 10, 2 );
-		add_action( 'add_meta_boxes', array(__CLASS__, 'register_metabox') );
+		add_action( 'add_meta_boxes', array(__CLASS__, 'register_metabox'), 9 );
 	}
 
 	/**
 	 *
 	 */
-	function register_metabox() {
+	public static function register_metabox() {
 		add_meta_box(
 			'p2pui_metabox',
 			__('Connection Information', 'p2p_ui'),
 			array(__CLASS__, 'render_metabox'),
-			P2P_UI_CPT_NAME
+			P2P_UI_CPT_NAME,
+			'advanced',
+			'high'
 		);
 	}
 
 	/**
 	 * @param WP_Post $post
 	 */
-	function render_metabox( WP_Post $post ) {
+	public static function render_metabox( WP_Post $post ) {
 		wp_nonce_field( plugins_url( __FILE__ ), 'p2pui_connect_type_nonce' );
 
 		// Get all registered post types
@@ -52,7 +54,7 @@ class P2P_UI_Admin_Metabox {
 	 *
 	 * @return bool
 	 */
-	function save_connection_meta( $post_id, WP_Post $post ) {
+	public static function save_connection_meta( $post_id, WP_Post $post ) {
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 			return false;
 		}
