@@ -18,10 +18,9 @@ class P2P_UI_Plugin {
 					'singular_name' => __('Connection', 'p2p_ui')
 				),
 				'public'        => false,
-				'show_in_menu'  => true,
+				'show_in_menu'  => 'options-general.php',
 				'show_ui'       => true,
 				'has_archive'   => false,
-				'menu_position' => 102,
 				'supports'      => array( 'title', 'editor', 'custom-fields' )
 			)
 		);
