@@ -9,24 +9,7 @@ Author URI: https://github.com/adammichaelwood
 License: In Progress
 */
 
-function p2pui_setup_maker_post_types() {	
-	register_post_type( 'p2pui_datatype',
-		array(
-			'labels' => array(
-				'name' => 'Data Types',
-				'singular_name' => 'Data Type'
-			),
-		'public' => false,
-		'has_archive' => false,
-                'show_in_menu' => true,
-                'show_ui' => true,
-		'menu_position' => 101,
-		'supports' => array('title', 'editor', 'custom-fields', 'excerpt', 'comments'),
-		'register_meta_box_cb' => 'p2pui_datatype_meta',
-		'hierarchical' => true,
-		'taxonomies' => array( 'category', 'post_tag' )
-		)
-	);
+function p2pui_setup_maker_post_types() {
 	register_post_type( 'p2pui_connect_type',
 		array(
 			'labels' => array(
@@ -105,64 +88,6 @@ function p2pui_connection_meta_content ( $post ) {
 <?php	}
 add_action( 'add_meta_boxes', 'p2pui_setup_metabox' );	//run the meta-box adding functions at just the right moment
 
-function p2pui_datatype_meta() {	
-    add_meta_box( 
-        'p2pui_datatype_metabox',
-        'Data Type Information',  
-        'p2pui_datatype_meta_content',
-        'p2pui_datatype',
-		'side',
-		'high'
-    );
-}
-function p2pui_datatype_meta_content ( $post ) {
-	wp_nonce_field( plugins_url( __FILE__ ), 'p2pui_datatype_nonce' );	// WP-nonce is used for security.
-	?>
-	<p>
-	<label for="p2pui_datatype_name_single">Datatype Name Single</label><br/>
-	<input type="text" id="p2pui_datatype_name_single" name="p2pui_datatype_name_single" value="<?php echo get_post_meta($post->ID, 'p2pui_datatype_name_single', true); ?>"/><br/>
-	</p>
-	<p>
-	<label for="p2pui_datatype_name_plural">Datatype Name Plural</label><br/>
-	<input type="text" id="p2pui_datatype_name_plural" name="p2pui_datatype_name_plural" value="<?php echo get_post_meta($post->ID, 'p2pui_datatype_name_plural', true); ?>"/><br/>
-	</p>
-	<p>
-	Hierarchical?<br/>
-	<label><input type="radio" class="input-radio" name="p2pui_datatype_hierarchical" value="1" <?php p2pui_datatype_is_hierarchical($post, 1); ?>>Yes </label><br/>
-	<label><input type="radio" class="input-radio" name="p2pui_datatype_hierarchical" value="0" <?php p2pui_datatype_is_hierarchical($post, 0); ?>> No</label><br/>
-	</p>
-<?php	}
-
-function p2pui_datatype_is_hierarchical($post, $hierarchical) {
-	if ( get_post_meta($post->ID, 'p2pui_datatype_hierarchical', true) == $hierarchical ) {
-		print 'checked="checked"';
-	} else {
-		return;
-	}
-}
-
-function p2pui_save_datatype_meta($post_id, $post) {
-        if(defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
-            return;
-
-        if ( ! isset( $_POST['post_type'] ) )
-            return;
-
-	if( 'p2pui_datatype' == $_POST['post_type']) {
-            if(!current_user_can('edit_page', $post_id))
-                return;
-	}
-
-	else if(!current_user_can('edit_post', $post_id))
-		return;
-
-	if(isset($_POST['p2pui_datatype_nonce']) && wp_verify_nonce($_POST['p2pui_datatype_nonce'], plugins_url(__FILE__)) && check_admin_referer(plugins_url(__FILE__), 'p2pui_datatype_nonce')) {
-		update_post_meta($post_id, 'p2pui_datatype_name_single', $_POST['p2pui_datatype_name_single']);
-		update_post_meta($post_id, 'p2pui_datatype_name_plural', $_POST['p2pui_datatype_name_plural']);
-		update_post_meta($post_id, 'p2pui_datatype_hierarchical', $_POST['p2pui_datatype_hierarchical']);
-    }
-	return;
-}
 
 function p2pui_save_connection_meta($post_id, $post) {	
 	if(defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
@@ -181,8 +106,7 @@ function p2pui_save_connection_meta($post_id, $post) {
     }
 	return;
 }
-add_action('save_post', 'p2pui_save_connection_meta', 10, 2);	
-add_action('save_post', 'p2pui_save_datatype_meta', 10, 2);
+add_action('save_post', 'p2pui_save_connection_meta', 10, 2);
 
 function p2pui_setup_connections() {	//registers connection-types from each connection-type post
         // Prevent fatal error if posts to posts has been deactivated
@@ -262,34 +186,3 @@ function p2pui_get_connection_fields($post) {		//sifts through the meta-data of 
 	}
 	return $fields;
 }
-
-function p2pui_setup_datatypes() {	//registers data-types from each data-type post
-	$get_post_args = array(
-		'numberposts'     => -1, // Get all of them
-		'post_type'       => 'p2pui_datatype',
-	);
-	$datatypes_to_register = get_posts( $get_post_args );
-	foreach ( $datatypes_to_register as $post ) :
-		setup_postdata($post);	//transforms $post (which is a small array of a few values, as fetched by the get_posts function) into the full $post object
-		$post_type_name = get_post_meta($post->ID, 'p2pui_datatype_name_single', true);
-		$datatype_args = array(
-			'public' 		=> true,
-			'label'			=> get_the_title($post->ID),
-			'hierarchical' 	=> true, //get_post_meta($post->ID, 'p2pui_datatype_hierarchical', true),
-			'supports' 		=> array(
-				'title',
-				'editor',
-				'author',
-				'thumbnail',
-				'excerpt',
-				'custom-fields',
-				'comments',
-				'revisions'
-			),
-			'has_archive' => true,
-		);
-		register_post_type( $post_type_name, $datatype_args );
-	endforeach;
-}
-add_action('init', 'p2pui_setup_datatypes');
-?>
